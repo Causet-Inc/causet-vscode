@@ -2,7 +2,7 @@
 
 **Write the rules. Trust the runtime.**
 
-First-class language support for [Causet](https://www.causet.io `.causet` files in VS Code and Cursor — syntax highlighting, semantic tokens, go-to-definition, find references, rename, diagnostics, completions, CodeLens, and more.
+First-class language support for [Causet](https://www.causet.io) `.causet` files in VS Code and Cursor — syntax highlighting, semantic tokens, go-to-definition, find references, rename, diagnostics, completions, CodeLens, and more.
 
 ---
 
