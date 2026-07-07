@@ -117,6 +117,10 @@ jobs:
         working-directory: shared
         run: npx tsc --noEmit
 
+      - name: Build shared (required for language-server typecheck)
+        working-directory: shared
+        run: npm run build
+
       - name: Type-check language server
         working-directory: language-server
         run: npx tsc --noEmit
