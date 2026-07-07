@@ -1,0 +1,226 @@
+{
+  "name": "causet-language-support",
+  "displayName": "Causet DSL",
+  "description": "First-class language support for the Causet DSL — syntax highlighting, semantic tokens, go-to-definition, find references, rename, diagnostics, completions, CodeLens, and more.",
+  "version": "0.3.0",
+  "publisher": "causet",
+  "license": "MIT",
+  "homepage": "https://github.com/causet/causet-vscode",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/causet/causet-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/causet/causet-vscode/issues"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Snippets",
+    "Themes"
+  ],
+  "keywords": [
+    "causet",
+    "dsl",
+    "event sourcing",
+    "cqrs",
+    "yaml",
+    "cursor",
+    "verdant"
+  ],
+  "main": "./dist/extension/extension.js",
+  "activationEvents": [
+    "onLanguage:causet"
+  ],
+  "icon": "icons/causet-icon.png",
+  "galleryBanner": {
+    "color": "#0F0F1A",
+    "theme": "dark"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "causet",
+        "aliases": [
+          "Causet",
+          "Causet DSL",
+          "causet"
+        ],
+        "extensions": [
+          ".causet"
+        ],
+        "filenames": [
+          "app.causet"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "icons/causet-file.svg",
+          "dark": "icons/causet-file.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "causet",
+        "scopeName": "source.causet",
+        "path": "./syntaxes/causet.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "causet",
+        "path": "./snippets/causet.code-snippets"
+      }
+    ],
+    "themes": [
+      {
+        "label": "Causet Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/causet-dark.json"
+      },
+      {
+        "label": "Causet Light",
+        "uiTheme": "vs",
+        "path": "./themes/causet-light.json"
+      }
+    ],
+    "icons": {
+      "causet-logo": {
+        "description": "Causet DSL logo",
+        "default": {
+          "fontPath": "./icons/causet-icon.png",
+          "fontCharacter": "C"
+        }
+      }
+    },
+    "iconThemes": [
+      {
+        "id": "causet-icons",
+        "label": "Causet File Icons",
+        "path": "./themes/causet-file-icons.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "causet.validateWorkspace",
+        "title": "Causet: Validate Workspace",
+        "category": "Causet"
+      },
+      {
+        "command": "causet.restartServer",
+        "title": "Causet: Restart Language Server",
+        "category": "Causet"
+      },
+      {
+        "command": "causet.showSymbolIndex",
+        "title": "Causet: Show Symbol Index",
+        "category": "Causet"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "causet.validateWorkspace",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "editorLangId == causet"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "causet.validateWorkspace",
+          "when": "editorLangId == causet",
+          "group": "causet"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "causet.validateWorkspace"
+        },
+        {
+          "command": "causet.restartServer"
+        },
+        {
+          "command": "causet.showSymbolIndex"
+        }
+      ]
+    },
+    "configurationDefaults": {
+      "[causet]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.quickSuggestions": {
+          "other": true,
+          "comments": false,
+          "strings": true
+        },
+        "editor.suggestOnTriggerCharacters": true,
+        "editor.semanticHighlighting.enabled": true,
+        "editor.formatOnSave": true,
+        "editor.rulers": [
+          120
+        ],
+        "editor.wordWrap": "off"
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Causet DSL",
+      "properties": {
+        "causet.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the Causet language server."
+        },
+        "causet.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Causet DSL diagnostics."
+        },
+        "causet.codelens.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show CodeLens annotations above projections, events, and actions."
+        },
+        "causet.completion.enableWorkspaceSymbols": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include workspace-wide event/projection/action names in completions."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "webpack --mode production",
+    "watch": "webpack --mode development --watch",
+    "clean": "rm -rf dist",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish",
+    "test": "node ./dist/tests/runTests.js"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/test-electron": "^2.4.0",
+    "@vscode/vsce": "^3.9.2",
+    "copy-webpack-plugin": "^14.0.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

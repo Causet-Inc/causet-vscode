@@ -1,0 +1,125 @@
+{
+  "name": "Causet Light",
+  "$schema": "vscode://schemas/color-theme",
+  "type": "light",
+  "colors": {
+    "editor.background": "#F5F5F5",
+    "editor.foreground": "#2D2D3F",
+    "editorLineNumber.foreground": "#AAAAAA",
+    "editorLineNumber.activeForeground": "#888888",
+    "editor.selectionBackground": "#D6E4FF",
+    "editor.lineHighlightBackground": "#EEEEEE",
+    "editorError.foreground": "#CC0000",
+    "editorWarning.foreground": "#E06C00",
+    "editorInfo.foreground": "#0070C1"
+  },
+  "tokenColors": [
+    {
+      "name": "Comment",
+      "scope": ["comment"],
+      "settings": { "foreground": "#AAAAAA", "fontStyle": "italic" }
+    },
+    {
+      "name": "Causet — Top-level section keywords",
+      "scope": ["keyword.control.section.causet", "keyword.control.manifest.causet"],
+      "settings": { "foreground": "#7B3FAE", "fontStyle": "bold" }
+    },
+    {
+      "name": "Causet — Rule phase keywords",
+      "scope": ["keyword.control.rule-phase.causet"],
+      "settings": { "foreground": "#AE3F7B", "fontStyle": "bold" }
+    },
+    {
+      "name": "Causet — Event names",
+      "scope": ["entity.name.type.event.causet", "constant.other.event-name.causet", "entity.name.type.event-ref.causet"],
+      "settings": { "foreground": "#0055AA", "fontStyle": "bold" }
+    },
+    {
+      "name": "Causet — Action names",
+      "scope": ["entity.name.function.action.causet", "entity.name.function.action-ref.causet"],
+      "settings": { "foreground": "#007A45", "fontStyle": "bold" }
+    },
+    {
+      "name": "Causet — Projection names",
+      "scope": ["entity.name.class.projection.causet", "entity.name.class.projection-ref.causet"],
+      "settings": { "foreground": "#8B5000" }
+    },
+    {
+      "name": "Causet — Entity names",
+      "scope": ["entity.name.type.entity.causet", "entity.name.type.entity-ref.causet"],
+      "settings": { "foreground": "#005F8B" }
+    },
+    {
+      "name": "Causet — DSL keys",
+      "scope": ["support.type.property-name.causet", "support.type.property-name.dsl-key.causet"],
+      "settings": { "foreground": "#2D2D3F" }
+    },
+    {
+      "name": "Causet — Operations",
+      "scope": ["keyword.operator.op.causet"],
+      "settings": { "foreground": "#E06C00", "fontStyle": "bold" }
+    },
+    {
+      "name": "Causet — SQL types",
+      "scope": ["storage.type.sql.causet"],
+      "settings": { "foreground": "#007A45" }
+    },
+    {
+      "name": "Causet — Scalar types",
+      "scope": ["storage.type.primitive.causet"],
+      "settings": { "foreground": "#007A45" }
+    },
+    {
+      "name": "Causet — Namespaces",
+      "scope": [
+        "variable.language.namespace.event.causet",
+        "variable.language.namespace.entity.causet",
+        "variable.language.namespace.intent.causet",
+        "variable.language.namespace.input.causet",
+        "variable.language.namespace.state.causet"
+      ],
+      "settings": { "foreground": "#005F8B", "fontStyle": "italic" }
+    },
+    {
+      "name": "Causet — Builtin functions",
+      "scope": ["support.function.builtin.causet"],
+      "settings": { "foreground": "#007A45", "fontStyle": "bold" }
+    },
+    {
+      "name": "Causet — Forbidden functions",
+      "scope": ["invalid.illegal.non-deterministic.causet", "invalid.illegal.forbidden-function.causet"],
+      "settings": { "foreground": "#CC0000", "fontStyle": "bold underline" }
+    },
+    {
+      "name": "Causet — Strings",
+      "scope": ["string.quoted.double.causet", "string.quoted.single.causet"],
+      "settings": { "foreground": "#007A45" }
+    },
+    {
+      "name": "Causet — Slash paths",
+      "scope": ["string.unquoted.slash-path.causet"],
+      "settings": { "foreground": "#5F3FAE" }
+    },
+    {
+      "name": "Causet — Numbers",
+      "scope": ["constant.numeric.causet"],
+      "settings": { "foreground": "#E06C00" }
+    },
+    {
+      "name": "Causet — Booleans / null",
+      "scope": ["constant.language.boolean.causet", "constant.language.null.causet"],
+      "settings": { "foreground": "#CC0000", "fontStyle": "bold" }
+    },
+    {
+      "name": "Causet — Query operators",
+      "scope": ["keyword.operator.query-op.causet"],
+      "settings": { "foreground": "#7B3FAE" }
+    },
+    {
+      "name": "Causet — Operators",
+      "scope": ["keyword.operator.comparison.causet", "keyword.operator.logical.causet"],
+      "settings": { "foreground": "#005F8B" }
+    }
+  ],
+  "semanticHighlighting": true
+}

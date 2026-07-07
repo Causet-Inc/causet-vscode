@@ -1,0 +1,25 @@
+{
+  "name": "causet-shared",
+  "version": "0.1.0",
+  "description": "Shared AST types, parser, and workspace index for the Causet language tooling",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "yaml": "^2.4.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,1070 @@
+{
+  "App Manifest": {
+    "prefix": ["app", "app.causet", "manifest"],
+    "body": [
+      "dsl_version: 1",
+      "app: ${1:my_app}",
+      "",
+      "includes:",
+      "  states:",
+      "    - ./states/**/*.state.causet",
+      "  events:",
+      "    - ./events/**/*.events.causet",
+      "  actions:",
+      "    - ./actions/**/*.actions.causet",
+      "  resources:",
+      "    - ./resources/**/*.resources.causet",
+      "  relationships:",
+      "    - ./relationships/**/*.relationships.causet",
+      "  projections:",
+      "    - ./projections/**/*.projections.causet",
+      "  queries:",
+      "    - ./queries/**/*.queries.causet",
+      "  sagas:",
+      "    - ./sagas/**/*.sagas.causet",
+      "  commit_envelopes:",
+      "    - ./commit_envelopes/**/*.envelope.causet",
+      "  providers:",
+      "    - ./providers/**/*.providers.causet",
+      "  prompts:",
+      "    - ./prompts/**/*.prompts.causet",
+      "  decisions:",
+      "    - ./decisions/**/*.decisions.causet",
+      "  memories:",
+      "    - ./memories/**/*.memories.causet$0"
+    ],
+    "description": "Root app.causet manifest with all includes (full showcase layout)"
+  },
+
+  "State Entity": {
+    "prefix": ["state", "entity"],
+    "body": [
+      "state:",
+      "  ${1:entity_name}:",
+      "    entity_key: ${2:${1}_id}",
+      "    description: \"${3:Entity description}\"",
+      "    fields:",
+      "      - name: ${2:${1}_id}",
+      "        type: string",
+      "        default: \"\"",
+      "      - name: status",
+      "        type: string",
+      "        default: \"\"",
+      "      - name: created_at",
+      "        type: number",
+      "        default: 0$0"
+    ],
+    "description": "State entity with entity_key and fields"
+  },
+
+  "State Field (simple)": {
+    "prefix": "field",
+    "body": [
+      "- name: ${1:field_name}",
+      "  type: ${2|string,number,int,boolean,array,object,json,uuid,timestamp|}",
+      "  default: ${3:\"\"}"
+    ],
+    "description": "Single state field entry"
+  },
+
+  "State Field (array)": {
+    "prefix": ["field-array", "array-field"],
+    "body": [
+      "- name: ${1:items}",
+      "  type: array",
+      "  item_type: ${2|object,string,number|}",
+      "  default: []$0"
+    ],
+    "description": "Array state field with item_type"
+  },
+
+  "State Field (object array)": {
+    "prefix": ["field-object-array", "object-array"],
+    "body": [
+      "- name: ${1:items}",
+      "  type: array",
+      "  item_type: object",
+      "  item_fields:",
+      "    ${2:id}: { type: string, required: true }",
+      "    ${3:value}: { type: ${4|string,number,boolean|}, required: false }",
+      "  default: []$0"
+    ],
+    "description": "Object-array state field with item_fields"
+  },
+
+  "Event Definition": {
+    "prefix": ["event", "ev"],
+    "body": [
+      "events:",
+      "  ${1:THING_HAPPENED}:",
+      "    state: ${2:thing}",
+      "    entity_expr: event.${3:${2}_id}",
+      "    payload:",
+      "      ${3:${2}_id}: string",
+      "      ${4:user_id}: string$0"
+    ],
+    "description": "Event definition with state and payload"
+  },
+
+  "Event (system kind)": {
+    "prefix": ["event-system", "system-event"],
+    "body": [
+      "  ${1:CLOCK_TICK}:",
+      "    state: ${2:scheduler}",
+      "    entity_expr: event.schedule_id",
+      "    kind: system",
+      "    payload:",
+      "      schedule_id: string",
+      "      ts: number$0"
+    ],
+    "description": "System event (clock tick, infra)"
+  },
+
+  "Action (full)": {
+    "prefix": ["action", "act"],
+    "body": [
+      "actions:",
+      "  ${1:DO_THING}:",
+      "    state: ${2:thing}",
+      "    entity_id_expr: event.${3:${2}_id}",
+      "    input:",
+      "      ${3:${2}_id}:",
+      "        type: string",
+      "        required: true",
+      "      ${4:field}:",
+      "        type: ${5|string,number,boolean|}",
+      "        required: ${6|true,false|}",
+      "    preflight:",
+      "      rules:",
+      "        - name: ${7:validate_input}",
+      "          when:",
+      "            expr: \"${8:!entity.active}\"",
+      "          then:",
+      "            - op: reject",
+      "              code: ${9:INVALID_STATE}",
+      "              message: \"${10:Cannot perform action in current state}\"",
+      "    core:",
+      "      rules:",
+      "        - name: ${11:apply_${1/(.+)/\\L$1/}}",
+      "          when: {}",
+      "          then:",
+      "            - op: set",
+      "              path: /${12:status}",
+      "              value: ${13:event.${4:field}}",
+      "            - op: emit",
+      "              event_type: ${14:THING_DONE}",
+      "              payload:",
+      "                ${3:${2}_id}: event.${3:${2}_id}$0"
+    ],
+    "description": "Full action with preflight validation, core mutation, and emit"
+  },
+
+  "Action (core only)": {
+    "prefix": ["action-simple", "action-core"],
+    "body": [
+      "actions:",
+      "  ${1:CREATE_THING}:",
+      "    state: ${2:thing}",
+      "    entity_id_expr: event.${3:${2}_id}",
+      "    input:",
+      "      ${3:${2}_id}:",
+      "        type: string",
+      "        required: true",
+      "    core:",
+      "      rules:",
+      "        - name: ${4:create}",
+      "          when: {}",
+      "          then:",
+      "            - op: set",
+      "              path: /${5:status}",
+      "              value: ${6:\"active\"}",
+      "            - op: emit",
+      "              event_type: ${7:THING_CREATED}",
+      "              payload:",
+      "                ${3:${2}_id}: event.${3:${2}_id}$0"
+    ],
+    "description": "Action with core rules only"
+  },
+
+  "Rule": {
+    "prefix": ["rule", "ruledef"],
+    "body": [
+      "- name: ${1:rule_name}",
+      "  when:",
+      "    expr: \"${2:entity.status == 'active'}\"",
+      "  then:",
+      "    - op: ${3|set,emit,add,sub,push,filter,reject|}",
+      "      ${4:path: /${5:field}}$0"
+    ],
+    "description": "Rule with when condition and then operations"
+  },
+
+  "Rule (unconditional)": {
+    "prefix": ["rule-always", "rule-unconditional"],
+    "body": [
+      "- name: ${1:rule_name}",
+      "  when: {}",
+      "  then:",
+      "    - op: ${2|set,emit,add,sub,push,filter|}",
+      "      ${3:path: /${4:field}}$0"
+    ],
+    "description": "Unconditional rule (always fires)"
+  },
+
+  "op: set": {
+    "prefix": ["op-set", "set"],
+    "body": [
+      "- op: set",
+      "  path: /${1:status}",
+      "  value: ${2:event.${1}}$0"
+    ],
+    "description": "Set a field value"
+  },
+
+  "op: emit": {
+    "prefix": ["op-emit", "emit"],
+    "body": [
+      "- op: emit",
+      "  event_type: ${1:THING_DONE}",
+      "  payload:",
+      "    ${2:entity_id}: event.${2}$0"
+    ],
+    "description": "Emit a domain event"
+  },
+
+  "op: emit with payload": {
+    "prefix": ["op-emit-payload", "emit-payload"],
+    "body": [
+      "- op: emit",
+      "  event_type: ${1:THING_DONE}",
+      "  payload:",
+      "    ${2:id}: event.${2}",
+      "    ${3:user_id}: event.${3}",
+      "    ${4:ts}: event.ts$0"
+    ],
+    "description": "Emit with multiple payload fields"
+  },
+
+  "op: add": {
+    "prefix": ["op-add", "add"],
+    "body": [
+      "- op: add",
+      "  path: /${1:count}",
+      "  value: ${2:1}",
+      "  cap:",
+      "    max: ${3:999999}$0"
+    ],
+    "description": "Add a value to a numeric field with cap"
+  },
+
+  "op: sub": {
+    "prefix": ["op-sub", "sub"],
+    "body": [
+      "- op: sub",
+      "  path: /${1:count}",
+      "  value: ${2:1}",
+      "  cap:",
+      "    min: ${3:0}$0"
+    ],
+    "description": "Subtract a value from a numeric field with floor"
+  },
+
+  "op: push": {
+    "prefix": ["op-push", "push"],
+    "body": [
+      "- op: push",
+      "  path: /${1:items}",
+      "  value:",
+      "    ${2:id}: event.${2}",
+      "    ${3:value}: event.${3}$0"
+    ],
+    "description": "Append an element to an array"
+  },
+
+  "op: filter": {
+    "prefix": ["op-filter", "filter"],
+    "body": [
+      "- op: filter",
+      "  path: /${1:items}",
+      "  where: \"${2:it.id != event.id}\"$0"
+    ],
+    "description": "Keep array elements matching predicate (where is a plain string)"
+  },
+
+  "op: reject": {
+    "prefix": ["op-reject", "reject"],
+    "body": [
+      "- op: reject",
+      "  code: ${1:INVALID_STATE}",
+      "  message: \"${2:Cannot perform action}\"$0"
+    ],
+    "description": "Reject the intent with an error code (preflight only)"
+  },
+
+  "op: submit": {
+    "prefix": ["op-submit", "submit"],
+    "body": [
+      "- op: submit",
+      "  intent_type: ${1:TARGET_ACTION}",
+      "  target_stream: ${2:entity}",
+      "  target_entity: event.${3:entity_id}",
+      "  payload:",
+      "    ${4:field}: event.${4}$0"
+    ],
+    "description": "Submit a follow-up intent to another action (side_effects)"
+  },
+
+  "op: relationship_create": {
+    "prefix": ["op-relationship-create", "rel-create"],
+    "body": [
+      "- op: relationship_create",
+      "  relationship: ${1:relationship_name}",
+      "  to_id: event.${2:target_id}$0"
+    ],
+    "description": "Create a graph edge relationship"
+  },
+
+  "op: relationship_remove": {
+    "prefix": ["op-relationship-remove", "rel-remove"],
+    "body": [
+      "- op: relationship_remove",
+      "  relationship: ${1:relationship_name}",
+      "  to_id: event.${2:target_id}$0"
+    ],
+    "description": "Remove a graph edge relationship"
+  },
+
+  "op: if": {
+    "prefix": ["op-if", "if"],
+    "body": [
+      "- op: if",
+      "  expr: \"${1:entity.status == 'active'}\"",
+      "  then:",
+      "    - op: set",
+      "      path: /${2:field}",
+      "      value: ${3:value}",
+      "  else:",
+      "    - op: set",
+      "      path: /${2:field}",
+      "      value: ${4:default}$0"
+    ],
+    "description": "Conditional if/else operation"
+  },
+
+  "op: for_each": {
+    "prefix": ["op-for-each", "foreach"],
+    "body": [
+      "- op: for_each",
+      "  for_each: \"${1:entity.items}\"",
+      "  then:",
+      "    - op: emit",
+      "      event_type: ${2:ITEM_PROCESSED}",
+      "      payload:",
+      "        item_id: item.${3:id}$0"
+    ],
+    "description": "Iterate over an array and execute ops per element"
+  },
+
+  "op: lookup": {
+    "prefix": ["op-lookup", "lookup"],
+    "body": [
+      "- op: lookup",
+      "  into: ${1:other_entity}",
+      "  stream: ${2:other_stream}",
+      "  entity_id_expr: event.${3:other_id}$0"
+    ],
+    "description": "Read a snapshot from another entity stream"
+  },
+
+  "Projection (full)": {
+    "prefix": ["projection", "proj"],
+    "body": [
+      "projections:",
+      "  ${1:thing_index}:",
+      "    source_events:",
+      "      - ${2:THING_CREATED}",
+      "      - ${3:THING_UPDATED}",
+      "    target:",
+      "      table: ${1:thing_index}",
+      "      primary_key:",
+      "        - ${4:thing_id}",
+      "    fields:",
+      "      ${4:thing_id}: TEXT",
+      "      ${5:status}: TEXT",
+      "      ${6:created_at}: BIGINT",
+      "      ${7:updated_at}: BIGINT",
+      "    derive:",
+      "      ${4:thing_id}: event.${4}",
+      "      ${5:status}: event.${5}",
+      "      ${6:created_at}: event.ts",
+      "      ${7:updated_at}: event.ts",
+      "    mutations:",
+      "      ${2:THING_CREATED}:",
+      "        op: upsert",
+      "      ${3:THING_UPDATED}:",
+      "        op: upsert",
+      "    indexes:",
+      "      - columns: [${5:status}]$0"
+    ],
+    "description": "Full projection with fields, derive, mutations, and indexes"
+  },
+
+  "Projection (counter/aggregate)": {
+    "prefix": ["projection-counter", "proj-counter"],
+    "body": [
+      "projections:",
+      "  ${1:thing_count}:",
+      "    source_events:",
+      "      - ${2:THING_CREATED}",
+      "      - ${3:THING_DELETED}",
+      "    target:",
+      "      table: ${1:thing_count}",
+      "      primary_key:",
+      "        - ${4:owner_id}",
+      "    fields:",
+      "      ${4:owner_id}: TEXT",
+      "      count: BIGINT",
+      "    derive:",
+      "      ${4:owner_id}: event.${4}",
+      "    aggregates:",
+      "      ${2:THING_CREATED}:",
+      "        count:",
+      "          op: add",
+      "          by: 1",
+      "          floor: 0",
+      "      ${3:THING_DELETED}:",
+      "        count:",
+      "          op: sub",
+      "          by: 1",
+      "          floor: 0",
+      "    mutations:",
+      "      ${2:THING_CREATED}:",
+      "        op: upsert$0"
+    ],
+    "description": "Counter projection using aggregates"
+  },
+
+  "Projection (sharded hot counter)": {
+    "prefix": ["projection-sharded", "proj-sharded", "hot-counter"],
+    "body": [
+      "projections:",
+      "  ${1:thing_count}:",
+      "    source_events:",
+      "      - ${2:THING_CREATED}",
+      "    target:",
+      "      table: ${1:thing_count}",
+      "      primary_key:",
+      "        - ${3:owner_id}",
+      "        - shard_id",
+      "    fields:",
+      "      ${3:owner_id}: TEXT",
+      "      shard_id: SMALLINT",
+      "      count: BIGINT",
+      "    derive:",
+      "      ${3:owner_id}: event.${3}",
+      "      shard_id: shard(event.${3}, 32)",
+      "    aggregates:",
+      "      ${2:THING_CREATED}:",
+      "        count:",
+      "          op: add",
+      "          by: 1",
+      "          floor: 0",
+      "    mutations:",
+      "      ${2:THING_CREATED}:",
+      "        op: upsert$0"
+    ],
+    "description": "Sharded hot counter projection (32 shards)"
+  },
+
+  "Query (filter + order)": {
+    "prefix": ["query", "qry"],
+    "body": [
+      "queries:",
+      "  ${1:get_${2:things}_by_${3:owner}}:",
+      "    from: ${4:thing_index}",
+      "    input:",
+      "      ${3:owner_id}:",
+      "        type: string",
+      "        required: true",
+      "    where:",
+      "      ${3:owner_id}:",
+      "        eq: input.${3:owner_id}",
+      "    order_by:",
+      "      ${5:created_at}: desc",
+      "    limit: ${6:50}$0"
+    ],
+    "description": "Query with filter, ordering, and limit"
+  },
+
+  "Query (count)": {
+    "prefix": ["query-count", "count-query"],
+    "body": [
+      "queries:",
+      "  ${1:count_${2:things}_for_${3:owner}}:",
+      "    from: ${4:thing_count}",
+      "    input:",
+      "      ${3:owner_id}:",
+      "        type: string",
+      "        required: true",
+      "    where:",
+      "      ${3:owner_id}:",
+      "        eq: input.${3:owner_id}",
+      "    group_by:",
+      "      - ${3:owner_id}",
+      "    aggregate:",
+      "      total:",
+      "        count: ${5:thing_id}",
+      "    limit: 1$0"
+    ],
+    "description": "Aggregate count query (group_by + aggregate)"
+  },
+
+  "Query (join)": {
+    "prefix": ["query-join", "join-query"],
+    "body": [
+      "queries:",
+      "  ${1:${2:thing}_with_${3:owner}_detail}:",
+      "    from: ${4:thing_index}",
+      "    joins:",
+      "      ${5:owner_profile}:",
+      "        type: left",
+      "        on:",
+      "          pairs:",
+      "            - { left: ${4:thing_index}.${6:owner_id}, right: ${5:owner_profile}.${6:owner_id} }",
+      "        fields:",
+      "          - ${5:owner_profile}.${7:display_name}",
+      "    input:",
+      "      ${6:owner_id}:",
+      "        type: string",
+      "        required: true",
+      "    where:",
+      "      ${4:thing_index}.${6:owner_id}:",
+      "        eq: input.${6:owner_id}",
+      "    limit: ${8:50}$0"
+    ],
+    "description": "Query with a left join"
+  },
+
+  "Relationship": {
+    "prefix": ["relationship", "rel"],
+    "body": [
+      "relationships:",
+      "  ${1:${2:follower}_${3:following}}:",
+      "    from: ${2:follower}",
+      "    to: ${3:following}",
+      "    cardinality: ${4|many_to_many,one_to_many,one_to_one|}",
+      "    unique: true",
+      "    emit_events:",
+      "      created: ${5:FOLLOWED}",
+      "      removed: ${6:UNFOLLOWED}$0"
+    ],
+    "description": "Relationship definition with emit events"
+  },
+
+  "Listener": {
+    "prefix": ["listener"],
+    "body": [
+      "listeners:",
+      "  - on: ${1:EVENT_NAME}",
+      "    priority: ${2:0}",
+      "    mutate:",
+      "      - op: increment",
+      "        field: ${3:count}",
+      "        value: ${4:1}$0"
+    ],
+    "description": "Listener that increments a field on event"
+  },
+
+  "Saga": {
+    "prefix": ["saga"],
+    "body": [
+      "sagas:",
+      "  ${1:purchase_flow}:",
+      "    state: ${2:order}",
+      "    state_path: _tmp/${1:purchase_flow}",
+      "    steps:",
+      "      - name: idle",
+      "        set: { step: 0 }",
+      "      - name: pending",
+      "        on: ${3:PURCHASE_INITIATED}",
+      "        set: { step: 1 }",
+      "      - name: complete",
+      "        on: ${4:PURCHASE_COMPLETED}",
+      "        set: { step: 2 }",
+      "        end: true$0"
+    ],
+    "description": "Multi-step saga definition"
+  },
+
+  "Resource": {
+    "prefix": ["resource", "static-lookup"],
+    "body": [
+      "resources:",
+      "  ${1:item_catalog}:",
+      "    ${2:item_001}:",
+      "      name: \"${3:Item Name}\"",
+      "      value: ${4:100}",
+      "      ${5:category}: \"${6:default}\"$0"
+    ],
+    "description": "Static resource lookup table"
+  },
+
+  "isnull expression": {
+    "prefix": ["isnull", "null-fallback"],
+    "body": "isnull(${1:event.field}, ${2:entity.field}, ${3:0})$0",
+    "description": "isnull() — returns first non-null value (safe for 0 and false)"
+  },
+
+  "coalesce expression": {
+    "prefix": ["coalesce", "string-fallback"],
+    "body": "coalesce(${1:event.field}, \"${2:default}\")$0",
+    "description": "coalesce() — returns fallback if null OR empty string"
+  },
+
+  "shard expression": {
+    "prefix": ["shard"],
+    "body": "shard(${1:event.owner_id}, ${2:32})$0",
+    "description": "shard() — distribute into N buckets for hot-counter sharding"
+  },
+
+  "concat expression": {
+    "prefix": ["concat"],
+    "body": "concat('${1:prefix_}', ${2:event.a}, '_', ${3:event.b})$0",
+    "description": "concat() — build a deterministic composite ID"
+  },
+
+  "LOOKUP_FIELD expression": {
+    "prefix": ["LOOKUP_FIELD", "lookup-field"],
+    "body": "LOOKUP_FIELD('${1:entity_stream}', ${2:event.entity_id}, '/${3:field/path}')$0",
+    "description": "LOOKUP_FIELD() — synchronous cross-stream field read (preflight/projection only)"
+  },
+
+  "Full .state.causet file": {
+    "prefix": ["state-file", "state.causet"],
+    "body": [
+      "state:",
+      "  ${1:entity_name}:",
+      "    entity_key: ${2:${1}_id}",
+      "    description: \"${3:${1} entity}\"",
+      "    fields:",
+      "      - name: ${2:${1}_id}",
+      "        type: string",
+      "        default: \"\"",
+      "      - name: status",
+      "        type: string",
+      "        default: \"\"",
+      "      - name: created_at",
+      "        type: number",
+      "        default: 0",
+      "      - name: updated_at",
+      "        type: number",
+      "        default: 0$0"
+    ],
+    "description": "Complete .state.causet file"
+  },
+
+  "Full .events.causet file": {
+    "prefix": ["events-file", "events.causet"],
+    "body": [
+      "events:",
+      "  ${1:THING_CREATED}:",
+      "    state: ${2:thing}",
+      "    entity_expr: event.${3:${2}_id}",
+      "    payload:",
+      "      ${3:${2}_id}: string",
+      "      ${4:user_id}: string",
+      "      ts: number",
+      "",
+      "  ${5:THING_UPDATED}:",
+      "    state: ${2:thing}",
+      "    entity_expr: event.${3:${2}_id}",
+      "    payload:",
+      "      ${3:${2}_id}: string",
+      "      ${6:field}: ${7|string,number,boolean|}$0"
+    ],
+    "description": "Complete .events.causet file with two events"
+  },
+
+  "Full .projections.causet file": {
+    "prefix": ["projections-file", "projections.causet"],
+    "body": [
+      "projections:",
+      "  ${1:thing_detail}:",
+      "    source_events:",
+      "      - ${2:THING_CREATED}",
+      "      - ${3:THING_UPDATED}",
+      "    target:",
+      "      table: ${1:thing_detail}",
+      "      primary_key:",
+      "        - ${4:thing_id}",
+      "    fields:",
+      "      ${4:thing_id}: TEXT",
+      "      ${5:user_id}: TEXT",
+      "      ${6:status}: TEXT",
+      "      created_at: BIGINT",
+      "      updated_at: BIGINT",
+      "    derive:",
+      "      ${4:thing_id}: event.${4}",
+      "      ${5:user_id}: event.${5}",
+      "      ${6:status}: event.${6}",
+      "      created_at: event.ts",
+      "      updated_at: event.ts",
+      "    mutations:",
+      "      ${2:THING_CREATED}:",
+      "        op: upsert",
+      "      ${3:THING_UPDATED}:",
+      "        op: upsert",
+      "    indexes:",
+      "      - columns: [${5:user_id}]",
+      "      - columns: [updated_at]",
+      "        direction: desc$0"
+    ],
+    "description": "Complete .projections.causet file"
+  },
+
+  "Full .queries.causet file": {
+    "prefix": ["queries-file", "queries.causet"],
+    "body": [
+      "queries:",
+      "  get_${1:thing}:",
+      "    from: ${2:thing_detail}",
+      "    input:",
+      "      ${3:thing_id}:",
+      "        type: string",
+      "        required: true",
+      "    where:",
+      "      ${3:thing_id}:",
+      "        eq: input.${3:thing_id}",
+      "    limit: 1",
+      "",
+      "  list_${1:thing}s_by_${4:user}:",
+      "    from: ${2:thing_detail}",
+      "    input:",
+      "      ${4:user_id}:",
+      "        type: string",
+      "        required: true",
+      "    where:",
+      "      ${4:user_id}:",
+      "        eq: input.${4:user_id}",
+      "    order_by:",
+      "      updated_at: desc",
+      "    limit: ${5:50}$0"
+    ],
+    "description": "Complete .queries.causet file with get and list queries"
+  },
+
+  "Commit Envelope": {
+    "prefix": ["commit_envelope", "envelope", "2pc"],
+    "body": [
+      "commit_envelopes:",
+      "  ${1:transfer_name}:",
+      "    start_action: ${2:START_TRANSFER}",
+      "    envelope_state: ${3:transfer}",
+      "    envelope_state_path: envelope",
+      "",
+      "    lifecycle:",
+      "      prepare_event: ${4:TRANSFER_PREPARE}",
+      "      prepared_event: ${5:TRANSFER_PREPARED}",
+      "      commit_event: ${6:TRANSFER_COMMIT}",
+      "      abort_event: ${7:TRANSFER_ABORT}",
+      "",
+      "    timeout:",
+      "      abort_after_seconds: ${8:30}",
+      "      tick_event: ${9:CLOCK_TICK}",
+      "",
+      "    causal_ordering:",
+      "      mode: per_entity",
+      "      cursor_field: /${10:visible/causal/last_envelope_seq}",
+      "      seq_source: envelope.seq",
+      "",
+      "    participants:",
+      "      - name: ${11:source}",
+      "        state: ${12:wallet}",
+      "        entity_expr: intent.${13:from_wallet_id}",
+      "        delta_expr: 0 - event.${14:amount}",
+      "        visibility_gate:",
+      "          strategy: shadow_state",
+      "          visible_path: /${15:visible}",
+      "          pending_path: /${16:pending_envelopes}",
+      "      - name: ${17:dest}",
+      "        state: ${12:wallet}",
+      "        entity_expr: intent.${18:to_wallet_id}",
+      "        delta_expr: event.${14:amount}",
+      "        visibility_gate:",
+      "          strategy: shadow_state",
+      "          visible_path: /${15:visible}",
+      "          pending_path: /${16:pending_envelopes}$0"
+    ],
+    "description": "Full 2-phase commit envelope definition"
+  },
+
+  "Projection with RANGE partition": {
+    "prefix": ["projection-range", "range-partition"],
+    "body": [
+      "projections:",
+      "  ${1:metric_name}:",
+      "    description: \"${2:Time-bucketed metrics}\"",
+      "    source_events:",
+      "      - ${3:EVENT_NAME}",
+      "    target:",
+      "      table: ${1:metric_name}",
+      "      primary_key: [bucket_start]",
+      "    bucket:",
+      "      field: event.ts",
+      "      interval: 24h",
+      "    fields:",
+      "      bucket_start: TIMESTAMP",
+      "      ${4:metric_count}: BIGINT",
+      "    aggregates:",
+      "      ${3:EVENT_NAME}:",
+      "        ${4:metric_count}: { op: add, by: 1 }",
+      "    partition:",
+      "      strategy: range",
+      "      field: bucket_start",
+      "      interval: \"1 month\"",
+      "      precreate: ${5:2}",
+      "      retention: \"${6:24 months}\"",
+      "      default_partition: true$0"
+    ],
+    "description": "Projection with PostgreSQL RANGE partitioning"
+  },
+
+  "Projection with HASH partition": {
+    "prefix": ["projection-hash", "hash-partition"],
+    "body": [
+      "projections:",
+      "  ${1:projection_name}:",
+      "    description: \"${2:Hash-distributed projection}\"",
+      "    source_events:",
+      "      - ${3:EVENT_NAME}",
+      "    target:",
+      "      table: ${1:projection_name}",
+      "      primary_key: [${4:entity_id}, shard_id]",
+      "    fields:",
+      "      ${4:entity_id}: TEXT",
+      "      shard_id: INT",
+      "      ${5:counter}: BIGINT",
+      "    derive:",
+      "      ${4:entity_id}: event.${4:entity_id}",
+      "      shard_id: shard(event.${4:entity_id}, ${6:32})",
+      "    aggregates:",
+      "      ${3:EVENT_NAME}:",
+      "        ${5:counter}: { op: add, by: 1 }",
+      "    partition:",
+      "      strategy: hash",
+      "      field: ${4:entity_id}",
+      "      partitions: ${6:32}$0"
+    ],
+    "description": "Projection with PostgreSQL HASH partitioning"
+  },
+
+  "Projection with LIST partition": {
+    "prefix": ["projection-list", "list-partition"],
+    "body": [
+      "projections:",
+      "  ${1:projection_name}:",
+      "    description: \"${2:List-partitioned by category}\"",
+      "    source_events:",
+      "      - ${3:EVENT_NAME}",
+      "    target:",
+      "      table: ${1:projection_name}",
+      "      primary_key: [${4:category}, ${5:entity_id}]",
+      "    fields:",
+      "      ${4:category}: TEXT",
+      "      ${5:entity_id}: TEXT",
+      "      ${6:title}: TEXT",
+      "    derive:",
+      "      ${4:category}: event.${4:category}",
+      "      ${5:entity_id}: event.${5:entity_id}",
+      "      ${6:title}: event.${6:title}",
+      "    mutations:",
+      "      ${3:EVENT_NAME}:",
+      "        op: upsert",
+      "    partition:",
+      "      strategy: list",
+      "      field: ${4:category}",
+      "      default_partition: true$0"
+    ],
+    "description": "Projection with PostgreSQL LIST partitioning"
+  },
+
+  "Query with aggregate sum": {
+    "prefix": ["query-sum", "aggregate-sum"],
+    "body": [
+      "queries:",
+      "  ${1:query_name}:",
+      "    from: ${2:projection_name}",
+      "    input:",
+      "      ${3:entity_id}: { type: string, required: true }",
+      "    where:",
+      "      ${3:entity_id}: { eq: input.${3:entity_id} }",
+      "    group_by:",
+      "      - ${3:entity_id}",
+      "    aggregate:",
+      "      total_${4:metric}:",
+      "        sum: ${4:metric}_count",
+      "    limit: ${5:1}$0"
+    ],
+    "description": "Query with GROUP BY and SUM aggregate"
+  },
+
+  "Saga state machine": {
+    "prefix": ["saga", "state-machine"],
+    "body": [
+      "sagas:",
+      "  ${1:saga_name}:",
+      "    state: ${2:entity_name}",
+      "    state_path: _tmp/${1:saga_name}",
+      "    steps:",
+      "      - name: idle",
+      "        set: { step: 0 }",
+      "      - name: pending",
+      "        on: ${3:STEP_ONE_EVENT}",
+      "        set: { step: 1 }",
+      "      - name: complete",
+      "        on: ${4:STEP_TWO_EVENT}",
+      "        set: { step: 2 }",
+      "        end: true$0"
+    ],
+    "description": "Multi-step saga state machine"
+  },
+
+  "Resources lookup table": {
+    "prefix": ["resources", "lookup-table"],
+    "body": [
+      "resources:",
+      "  ${1:catalog_name}:",
+      "    ${2:entry_key}:",
+      "      name: ${3:Entry Name}",
+      "      value: ${4:100}$0"
+    ],
+    "description": "Static resource lookup table"
+  },
+
+  "op: lock/unlock": {
+    "prefix": ["lock", "op-lock"],
+    "body": [
+      "- op: lock",
+      "  key: \"concat('${1:prefix}:', event.${2:entity_id})\"",
+      "$0",
+      "- op: unlock",
+      "  key: \"concat('${1:prefix}:', event.${2:entity_id})\""
+    ],
+    "description": "Lock/unlock operation pair with concat key"
+  },
+
+  "op: lookup (cross-stream snapshot)": {
+    "prefix": ["lookup", "op-lookup"],
+    "body": [
+      "- op: lookup",
+      "  into: /_tmp/${1:snapshot_name}",
+      "  stream: ${2:entity_stream}",
+      "  entity_id_expr: event.${3:target_id}$0"
+    ],
+    "description": "Lookup a snapshot from another entity stream"
+  },
+
+  "op: emit_each (fan-out)": {
+    "prefix": ["emit_each", "op-emit-each", "fan-out"],
+    "body": [
+      "- op: emit_each",
+      "  from: entity.${1:items}",
+      "  event_type: ${2:ITEM_EVENT}",
+      "  payload:",
+      "    ${3:entity_id}: event.${3:entity_id}",
+      "    ${4:value}: \"item.${4:value}\"$0"
+    ],
+    "description": "Fan-out emit for each element in an array"
+  },
+
+  "Commit envelope system clock event": {
+    "prefix": ["clock-tick", "tick-event", "system-event"],
+    "body": [
+      "events:",
+      "  ${1:CLOCK_TICK}:",
+      "    state: ${2:transfer}",
+      "    entity_expr: event.${3:transfer_id}",
+      "    kind: system",
+      "    payload:",
+      "      ${3:transfer_id}: { type: string, required: true }",
+      "      instantTime: { type: int, required: true }$0"
+    ],
+    "description": "System clock tick event for commit envelope timeouts"
+  },
+
+  "AI Provider": {
+    "prefix": ["provider", "providers", "ai-provider"],
+    "body": [
+      "providers:",
+      "  ${1:reasoning}:",
+      "    executor: ${2|openai,anthropic,ollama,mock|}",
+      "    model: ${3:gpt-4o-mini}",
+      "    temperature: ${4:0.2}",
+      "    max_tokens: ${5:1024}$0"
+    ],
+    "description": "Logical AI provider (BYOK credentials at runtime)"
+  },
+
+  "AI Prompt Template": {
+    "prefix": ["prompt", "prompts", "ai-prompt"],
+    "body": [
+      "prompts:",
+      "  ${1:triage_v1}:",
+      "    instructions: |",
+      "      ${2:Describe the task.}",
+      "",
+      "      Input: {{ ${3:field} }}",
+      "      Context: {{ memories.${4:customer_history} }}$0"
+    ],
+    "description": "Prompt template for AI decisions"
+  },
+
+  "AI Decision": {
+    "prefix": ["decision", "decisions", "ai-decision"],
+    "body": [
+      "decisions:",
+      "  ${1:triage_ticket}:",
+      "    provider: ${2:reasoning}",
+      "    prompt: ${3:triage_v1}",
+      "    emits: ${4:TICKET_AI_TRIAGED}",
+      "    memories:",
+      "      - ${5:customer_history}",
+      "    input:",
+      "      ${6:ticket_id}:",
+      "        type: string",
+      "        required: true",
+      "    output:",
+      "      ${7:priority}:",
+      "        type: string",
+      "        required: true$0"
+    ],
+    "description": "AI decision definition with provider + memory refs"
+  },
+
+  "AI Memory": {
+    "prefix": ["memory", "memories", "ai-memory"],
+    "body": [
+      "memories:",
+      "  ${1:customer_history}:",
+      "    source_events:",
+      "      - ${2:ORDER_PLACED}",
+      "    partition_by: ${3:customer_id}",
+      "    embedding:",
+      "      provider: ${4:embeddings}",
+      "    content: |",
+      "      [{{ event.type }}] customer={{ event.${3:customer_id} }}$0"
+    ],
+    "description": "Event-driven memory with embedding provider"
+  },
+
+  "op: decision": {
+    "prefix": ["op-decision", "decision-op", "run-decision"],
+    "body": [
+      "- op: decision",
+      "  ref: ${1:triage_ticket}",
+      "  input:",
+      "    ${2:ticket_id}: intent.${2:ticket_id}$0"
+    ],
+    "description": "Invoke a compiled AI decision from an action rule"
+  }
+}

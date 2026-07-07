@@ -1,0 +1,155 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build shared package
+        working-directory: shared
+        run: npm run build
+
+      - name: Build language server
+        working-directory: language-server
+        run: npm run build
+
+      - name: Build extension
+        working-directory: extension
+        run: npm run build
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: causet-extension-dist
+          path: extension/dist/
+          retention-days: 7
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build shared (required for tests)
+        working-directory: shared
+        run: npm run build
+
+      - name: Run tests with coverage
+        working-directory: tests
+        run: npm run test:coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: tests/coverage/
+          retention-days: 7
+
+  grammar:
+    name: Validate Grammar JSON
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate causet.tmLanguage.json
+        run: node -e "JSON.parse(require('fs').readFileSync('extension/syntaxes/causet.tmLanguage.json', 'utf8')); console.log('Grammar JSON valid ✓');"
+
+      - name: Validate snippets JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('extension/snippets/causet.code-snippets', 'utf8')); console.log('Snippets JSON valid ✓');"
+
+      - name: Validate dark theme JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('extension/themes/causet-dark.json', 'utf8')); console.log('Dark theme JSON valid ✓');"
+
+      - name: Validate light theme JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('extension/themes/causet-light.json', 'utf8')); console.log('Light theme JSON valid ✓');"
+
+      - name: Validate file icon theme JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('extension/themes/causet-file-icons.json', 'utf8')); console.log('File icon theme JSON valid ✓');"
+
+      - name: Validate extension package.json
+        run: node -e "JSON.parse(require('fs').readFileSync('extension/package.json', 'utf8')); console.log('Extension package.json valid ✓');"
+
+  typecheck:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type-check shared
+        working-directory: shared
+        run: npx tsc --noEmit
+
+      - name: Type-check language server
+        working-directory: language-server
+        run: npx tsc --noEmit
+
+  package:
+    name: Package VSIX
+    runs-on: ubuntu-latest
+    needs: [build, test, grammar]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Package extension
+        working-directory: extension
+        run: vsce package --no-dependencies -o causet-language-support.vsix
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: causet-language-support-vsix
+          path: extension/causet-language-support.vsix
+          retention-days: 30

@@ -1,0 +1,54 @@
+{
+  "iconDefinitions": {
+    "_causet": {
+      "iconPath": "../icons/causet-file.svg"
+    },
+    "_causet-state": {
+      "iconPath": "../icons/causet-state.svg"
+    },
+    "_causet-events": {
+      "iconPath": "../icons/causet-events.svg"
+    },
+    "_causet-actions": {
+      "iconPath": "../icons/causet-actions.svg"
+    },
+    "_causet-projections": {
+      "iconPath": "../icons/causet-projections.svg"
+    },
+    "_causet-queries": {
+      "iconPath": "../icons/causet-queries.svg"
+    },
+    "_causet-relationships": {
+      "iconPath": "../icons/causet-relationships.svg"
+    },
+    "_causet-app": {
+      "iconPath": "../icons/causet-logo.svg"
+    }
+  },
+  "fileNames": {
+    "app.causet": "_causet-app"
+  },
+  "fileExtensions": {
+    "causet": "_causet"
+  },
+  "fileNamesWithExtensions": {
+    "state.causet":         "_causet-state",
+    "events.causet":        "_causet-events",
+    "actions.causet":       "_causet-actions",
+    "projections.causet":   "_causet-projections",
+    "queries.causet":       "_causet-queries",
+    "relationships.causet": "_causet-relationships",
+    "listeners.causet":     "_causet",
+    "providers.causet":     "_causet",
+    "prompts.causet":       "_causet",
+    "decisions.causet":     "_causet",
+    "memories.causet":      "_causet",
+    "sagas.causet":         "_causet",
+    "resources.causet":     "_causet",
+    "policy.causet":        "_causet",
+    "workflow.causet":      "_causet",
+    "intent.causet":        "_causet",
+    "aggregate.causet":     "_causet",
+    "envelope.causet":      "_causet"
+  }
+}

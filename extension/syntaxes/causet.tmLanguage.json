@@ -1,0 +1,1331 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Causet",
+  "scopeName": "source.causet",
+  "fileTypes": ["causet"],
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#root-manifest" },
+    { "include": "#top-level-sections" },
+    { "include": "#state-block" },
+    { "include": "#events-block" },
+    { "include": "#actions-block" },
+    { "include": "#projections-block" },
+    { "include": "#queries-block" },
+    { "include": "#relationships-block" },
+    { "include": "#listeners-block" },
+    { "include": "#sagas-block" },
+    { "include": "#resources-block" },
+    { "include": "#commit-envelopes-block" },
+    { "include": "#screaming-snake-identifier" },
+    { "include": "#snake-case-identifier" },
+    { "include": "#dsl-keys" },
+    { "include": "#ops-inline" },
+    { "include": "#sql-types" },
+    { "include": "#scalar-types" },
+    { "include": "#mutation-ops" },
+    { "include": "#query-operators" },
+    { "include": "#namespaces" },
+    { "include": "#builtin-functions" },
+    { "include": "#slash-paths" },
+    { "include": "#string-double" },
+    { "include": "#string-single" },
+    { "include": "#boolean-null" },
+    { "include": "#numbers" },
+    { "include": "#brackets" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+
+    "comment": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.causet",
+          "match": "#.*$"
+        }
+      ]
+    },
+
+    "root-manifest": {
+      "patterns": [
+        {
+          "comment": "dsl_version: N",
+          "match": "^(dsl_version)(\\s*:\\s*)(\\d+)\\s*(?:#.*)?$",
+          "captures": {
+            "1": { "name": "keyword.control.manifest.dsl-version.causet" },
+            "2": { "name": "punctuation.separator.key-value.causet" },
+            "3": { "name": "constant.numeric.dsl-version.causet" }
+          }
+        },
+        {
+          "comment": "app: my_app_name",
+          "match": "^(app)(\\s*:\\s*)([a-z][a-z0-9_]*)\\s*(?:#.*)?$",
+          "captures": {
+            "1": { "name": "keyword.control.manifest.app.causet" },
+            "2": { "name": "punctuation.separator.key-value.causet" },
+            "3": { "name": "entity.name.class.app.causet" }
+          }
+        },
+        {
+          "comment": "includes: section header",
+          "match": "^(includes)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "1": { "name": "keyword.control.manifest.includes.causet" },
+            "2": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "includes sub-keys: states, events, actions, projections, queries, relationships, sagas, resources, commit_envelopes",
+          "match": "^(\\s{2,})(states|events|actions|projections|queries|relationships|sagas|resources|commit_envelopes|listeners|prompts|decisions|memories|providers)(\\s*:)",
+          "captures": {
+            "1": { "name": "punctuation.whitespace.leading.causet" },
+            "2": { "name": "support.type.property-name.includes-key.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "includes glob pattern value",
+          "match": "(?<=- )(\\.\\./[^\\s#]+|\\./[^\\s#]+|[*][^\\s#]*)",
+          "name": "string.unquoted.glob-pattern.causet"
+        }
+      ]
+    },
+
+    "top-level-sections": {
+      "patterns": [
+        {
+          "comment": "state: / events: / actions: / projections: / queries: / relationships: / listeners: / sagas: / resources: / commit_envelopes:",
+          "match": "^(state|events|actions|projections|queries|relationships|listeners|sagas|resources|commit_envelopes|prompts|decisions|memories|providers)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "1": { "name": "keyword.control.section.causet" },
+            "2": { "name": "punctuation.separator.key-value.causet" }
+          }
+        }
+      ]
+    },
+
+    "state-block": {
+      "patterns": [
+        {
+          "comment": "Entity name (snake_case key under state:)",
+          "match": "^(\\s{2})([a-z][a-z0-9_]*)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "entity.name.type.entity.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "entity_key: field_name",
+          "match": "^(\\s{4,})(entity_key)(\\s*:\\s*)([a-z][a-z0-9_/]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.entity-key.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" },
+            "4": { "name": "variable.other.field-name.entity-key.causet" }
+          }
+        },
+        {
+          "comment": "description: value",
+          "match": "^(\\s+)(description)(\\s*:\\s*)(.*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.description.causet" },
+            "4": { "name": "string.unquoted.description.causet" }
+          }
+        },
+        {
+          "comment": "fields: section",
+          "match": "^(\\s+)(fields)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.fields.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "- name: field_path/with_slash (slash-path field names)",
+          "match": "^(\\s+- )(name)(\\s*:\\s*)([a-z][a-z0-9_/]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.field-name-key.causet" },
+            "4": { "name": "variable.other.field.causet" }
+          }
+        },
+        {
+          "comment": "Field type: string | number | int | boolean | array | object | etc.",
+          "match": "^(\\s+)(type)(\\s*:\\s*)(string|number|int|integer|decimal|boolean|bool|array|object|any|json|timestamp|datetime|date|uuid|float|double)(\\??)",
+          "captures": {
+            "2": { "name": "support.type.property-name.type-key.causet" },
+            "4": { "name": "storage.type.primitive.causet" },
+            "5": { "name": "keyword.operator.nullable.causet" }
+          }
+        },
+        {
+          "comment": "item_type: ...",
+          "match": "^(\\s+)(item_type)(\\s*:\\s*)(string|number|int|integer|decimal|boolean|bool|array|object|any|json|timestamp|datetime|date|uuid|float|double)(\\??)",
+          "captures": {
+            "2": { "name": "support.type.property-name.item-type-key.causet" },
+            "4": { "name": "storage.type.primitive.causet" },
+            "5": { "name": "keyword.operator.nullable.causet" }
+          }
+        },
+        {
+          "comment": "required: true|false",
+          "match": "^(\\s+)(required)(\\s*:\\s*)(true|false)",
+          "captures": {
+            "2": { "name": "support.type.property-name.required.causet" },
+            "4": { "name": "constant.language.boolean.causet" }
+          }
+        },
+        {
+          "comment": "default: value",
+          "match": "^(\\s+)(default)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.default.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "item_fields: section",
+          "match": "^(\\s+)(item_fields)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.item-fields.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        }
+      ]
+    },
+
+    "events-block": {
+      "patterns": [
+        {
+          "comment": "Event name (SCREAMING_SNAKE key under events:) with entity_expr",
+          "match": "^(\\s{2})([A-Z][A-Z0-9_]+)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "entity.name.type.event.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "state: entity_name under event",
+          "match": "^(\\s{4,})(state)(\\s*:\\s*)([a-z][a-z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.state-ref.causet" },
+            "4": { "name": "entity.name.type.entity-ref.causet" }
+          }
+        },
+        {
+          "comment": "entity_expr: event.entity_id etc.",
+          "match": "^(\\s+)(entity_expr)(\\s*:\\s*)(.*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.entity-expr.causet" },
+            "4": { "name": "meta.expression.entity-expr.causet" }
+          }
+        },
+        {
+          "comment": "payload: section",
+          "match": "^(\\s+)(payload)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.payload.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "Payload field: field_name: type (short form)",
+          "match": "^(\\s{6,})([a-z][a-z0-9_]*)(\\s*:\\s*)(string|number|int|integer|boolean|bool|array|object|any|json|timestamp|datetime|uuid|float|double)(\\??)",
+          "captures": {
+            "2": { "name": "variable.other.payload-field.causet" },
+            "4": { "name": "storage.type.primitive.causet" },
+            "5": { "name": "keyword.operator.nullable.causet" }
+          }
+        },
+        {
+          "comment": "kind: event|system|fact|compute|command",
+          "match": "^(\\s+)(kind)(\\s*:\\s*)(event|system|fact|compute|command)",
+          "captures": {
+            "2": { "name": "support.type.property-name.kind.causet" },
+            "4": { "name": "constant.language.event-kind.causet" }
+          }
+        }
+      ]
+    },
+
+    "actions-block": {
+      "patterns": [
+        {
+          "comment": "Action name (SCREAMING_SNAKE key under actions:)",
+          "match": "^(\\s{2})([A-Z][A-Z0-9_]+)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "entity.name.function.action.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "entity_id_expr:",
+          "match": "^(\\s+)(entity_id_expr)(\\s*:\\s*)(.*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.entity-id-expr.causet" },
+            "4": { "name": "meta.expression.entity-id-expr.causet" }
+          }
+        },
+        {
+          "comment": "input: section",
+          "match": "^(\\s+)(input)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.input.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "Rule phases: preflight / core / side_effects / side_effect",
+          "match": "^(\\s+)(preflight|core|side_effects?)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "keyword.control.rule-phase.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "rules: section",
+          "match": "^(\\s+)(rules)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.rules.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "- name: rule_name",
+          "match": "^(\\s+-\\s+)(name)(\\s*:\\s*)([a-z][a-z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.rule-name-key.causet" },
+            "4": { "name": "entity.name.label.rule-name.causet" }
+          }
+        },
+        {
+          "comment": "when: section",
+          "match": "^(\\s+)(when)(\\s*:)",
+          "captures": {
+            "2": { "name": "keyword.control.when.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "then: section",
+          "match": "^(\\s+)(then)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "keyword.control.then.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "op: set|emit|add|sub|etc.",
+          "match": "^(\\s+)(op)(\\s*:\\s*)(set|add|sub|unset|merge|push|remove|filter|find|map|sort|clone|if|for_each|foreach|stop|continue|emit|emit_each|submit|reject|schedule|lock|unlock|lookup|relationship_create|relationship_remove|compute_regen|upsert|delete|replace|soft_delete|bulk_update|update|increment)",
+          "captures": {
+            "2": { "name": "support.type.property-name.op-key.causet" },
+            "4": { "name": "keyword.operator.op.causet" }
+          }
+        },
+        {
+          "comment": "path: /slash/path",
+          "match": "^(\\s+)(path)(\\s*:\\s*)(/[A-Za-z0-9_./:-]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.path.causet" },
+            "4": { "name": "string.unquoted.slash-path.causet" }
+          }
+        },
+        {
+          "comment": "value: expression (unquoted)",
+          "match": "^(\\s+)(value|cap|by)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.value.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "event_type: EVENT_NAME",
+          "match": "^(\\s+)(event_type)(\\s*:\\s*)([A-Z][A-Z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.event-type.causet" },
+            "4": { "name": "entity.name.type.event-ref.causet" }
+          }
+        },
+        {
+          "comment": "intent_type: ACTION_NAME",
+          "match": "^(\\s+)(intent_type)(\\s*:\\s*)([A-Z][A-Z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.intent-type.causet" },
+            "4": { "name": "entity.name.function.action-ref.causet" }
+          }
+        },
+        {
+          "comment": "target_stream: entity_name",
+          "match": "^(\\s+)(target_stream|target_entity)(\\s*:\\s*)(.*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.target-stream.causet" },
+            "4": { "name": "meta.expression.target.causet" }
+          }
+        },
+        {
+          "comment": "code: REJECT_CODE",
+          "match": "^(\\s+)(code)(\\s*:\\s*)([A-Z_][A-Z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.code.causet" },
+            "4": { "name": "constant.other.reject-code.causet" }
+          }
+        },
+        {
+          "comment": "message: error message string",
+          "match": "^(\\s+)(message)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.message.causet" }
+          }
+        },
+        {
+          "comment": "expr: expression string",
+          "match": "^(\\s+)(expr)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.expr.causet" }
+          }
+        },
+        {
+          "comment": "where: plain string expression (in filter/remove/find)",
+          "match": "^(\\s+)(where)(\\s*:\\s*)([\"'].*[\"']|[^\n#\"'{\\[]*[^\n#\"'{\\[ \t])\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.where.causet" },
+            "4": { "name": "meta.expression.where.causet" }
+          }
+        },
+        {
+          "comment": "priority: N",
+          "match": "^(\\s+)(priority)(\\s*:\\s*)(\\d+)",
+          "captures": {
+            "2": { "name": "support.type.property-name.priority.causet" },
+            "4": { "name": "constant.numeric.priority.causet" }
+          }
+        }
+      ]
+    },
+
+    "projections-block": {
+      "patterns": [
+        {
+          "comment": "Projection name (snake_case key under projections:)",
+          "match": "^(\\s{2})([a-z][a-z0-9_]*)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "entity.name.class.projection.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "source_events:",
+          "match": "^(\\s+)(source_events)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.source-events.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "target: section",
+          "match": "^(\\s+)(target)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.target.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "table: table_name",
+          "match": "^(\\s+)(table)(\\s*:\\s*)([a-z][a-z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.table.causet" },
+            "4": { "name": "entity.name.class.table.causet" }
+          }
+        },
+        {
+          "comment": "primary_key:",
+          "match": "^(\\s+)(primary_key)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.primary-key.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "derive: section",
+          "match": "^(\\s+)(derive)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.derive.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "mutations: section",
+          "match": "^(\\s+)(mutations)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.mutations.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "aggregates: section",
+          "match": "^(\\s+)(aggregates)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.aggregates.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "aggregate: section (singular, for queries)",
+          "match": "^(\\s+)(aggregate)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.aggregate.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "indexes: section",
+          "match": "^(\\s+)(indexes)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.indexes.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "columns: [field1, field2]",
+          "match": "^(\\s+)(columns)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.columns.causet" }
+          }
+        },
+        {
+          "comment": "direction: asc|desc",
+          "match": "^(\\s+)(direction)(\\s*:\\s*)(asc|desc)",
+          "captures": {
+            "2": { "name": "support.type.property-name.direction.causet" },
+            "4": { "name": "constant.language.direction.causet" }
+          }
+        },
+        {
+          "comment": "Mutation op inside mutations block: EVENT_NAME: { op: upsert|delete|replace }",
+          "match": "^(\\s{6,})([A-Z][A-Z0-9_]+)(\\s*:)(?:\\s*(\\{[^}]*\\})|\\s*(?:#.*)?$)",
+          "captures": {
+            "2": { "name": "entity.name.type.event-ref.mutation-key.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "upsert|delete|replace as values (projection mutations op field)",
+          "match": "(?<=op:\\s)(upsert|delete|replace|bulk_update)",
+          "name": "keyword.operator.mutation-op.causet"
+        },
+        {
+          "comment": "bucket: section",
+          "match": "^(\\s+)(bucket)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.bucket.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "interval: 1h|24h|5m|1d",
+          "match": "^(\\s+)(interval)(\\s*:\\s*)(\"?[0-9]+[smhd]\"?)",
+          "captures": {
+            "2": { "name": "support.type.property-name.interval.causet" },
+            "4": { "name": "string.unquoted.interval.causet" }
+          }
+        },
+        {
+          "comment": "SQL column types in fields block (TEXT, INTEGER, INT, BIGINT, DOUBLE, etc.)",
+          "match": "^(\\s{6,})([a-z][a-z0-9_]*)(\\s*:\\s*)(TEXT|INTEGER|INT|BIGINT|BOOLEAN|FLOAT|DOUBLE|JSON|UUID|TIMESTAMP|DECIMAL|NUMERIC|SMALLINT|TINYINT|CHAR|VARCHAR|REAL)\\b",
+          "captures": {
+            "2": { "name": "variable.other.column-name.causet" },
+            "4": { "name": "storage.type.sql.causet" }
+          }
+        },
+        {
+          "comment": "override: section",
+          "match": "^(\\s+)(override)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "keyword.control.override.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "floor: N (aggregate minimum)",
+          "match": "^(\\s+)(floor)(\\s*:\\s*)(\\d+)",
+          "captures": {
+            "2": { "name": "support.type.property-name.floor.causet" },
+            "4": { "name": "constant.numeric.floor.causet" }
+          }
+        },
+        {
+          "comment": "partition: sub-section inside a projection",
+          "match": "^(\\s{4})(partition)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "keyword.other.partition.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "partition strategy values: range|hash|list",
+          "match": "(?<=strategy:\\s)(range|hash|list)\\b",
+          "name": "constant.language.partition-strategy.causet"
+        },
+        {
+          "comment": "aggregate op values (add|sub) inside compact inline form { op: add, by: N }",
+          "match": "(?<=op:\\s)(add|sub)\\b(?=.*by:)",
+          "name": "keyword.operator.aggregate-op.inline.causet"
+        },
+        {
+          "comment": "sum: / count: aggregate keys inside aggregate: block (query aggregate functions)",
+          "match": "^(\\s{6,})([a-z][a-z0-9_]*)(\\s*:)\\s*(sum|count|avg|min|max|first|last)\\b",
+          "captures": {
+            "2": { "name": "variable.other.aggregate-alias.causet" },
+            "4": { "name": "keyword.operator.aggregate-fn.causet" }
+          }
+        }
+      ]
+    },
+
+    "queries-block": {
+      "patterns": [
+        {
+          "comment": "Query name (snake_case under queries:)",
+          "match": "^(\\s{2})([a-z][a-z0-9_]*)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "entity.name.function.query.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "from: projection_name",
+          "match": "^(\\s+)(from)(\\s*:\\s*)([a-z][a-z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.from.causet" },
+            "4": { "name": "entity.name.class.projection-ref.causet" }
+          }
+        },
+        {
+          "comment": "where: section",
+          "match": "^(\\s+)(where)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.where.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "Query where operators: eq, neq, gt, gte, lt, lte, in, nin, gte_window, like, ilike",
+          "match": "^(\\s+)(eq|neq|gt|gte|lt|lte|in|nin|gte_window|like|ilike)(\\s*:)",
+          "captures": {
+            "2": { "name": "keyword.operator.query-op.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "order_by: section",
+          "match": "^(\\s+)(order_by)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.order-by.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "asc|desc as order value",
+          "match": "(?<=:\\s)(asc|desc)\\b",
+          "name": "constant.language.order-direction.causet"
+        },
+        {
+          "comment": "group_by: section",
+          "match": "^(\\s+)(group_by)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.group-by.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "joins: section",
+          "match": "^(\\s+)(joins)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.joins.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "Join projection name key",
+          "match": "^(\\s{6,})([a-z][a-z0-9_]*)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "entity.name.class.join-projection.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "type: left|right|inner (join type)",
+          "match": "^(\\s+)(type)(\\s*:\\s*)(left|right|inner|cross)",
+          "captures": {
+            "2": { "name": "support.type.property-name.join-type.causet" },
+            "4": { "name": "constant.language.join-type.causet" }
+          }
+        },
+        {
+          "comment": "on: section",
+          "match": "^(\\s+)(on)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.on.causet" }
+          }
+        },
+        {
+          "comment": "pairs: section",
+          "match": "^(\\s+)(pairs)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.pairs.causet" }
+          }
+        },
+        {
+          "comment": "left: / right: (join pair keys)",
+          "match": "^(\\s+)(left|right)(\\s*:\\s*)([a-z][a-z0-9_.]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.join-side.causet" },
+            "4": { "name": "variable.other.join-column.causet" }
+          }
+        },
+        {
+          "comment": "limit: N",
+          "match": "^(\\s+)(limit)(\\s*:\\s*)(\\d+)",
+          "captures": {
+            "2": { "name": "support.type.property-name.limit.causet" },
+            "4": { "name": "constant.numeric.limit.causet" }
+          }
+        },
+        {
+          "comment": "distinct: true|false",
+          "match": "^(\\s+)(distinct)(\\s*:\\s*)(true|false)",
+          "captures": {
+            "2": { "name": "support.type.property-name.distinct.causet" },
+            "4": { "name": "constant.language.boolean.causet" }
+          }
+        },
+        {
+          "comment": "coalesce_zero: [field1, field2]",
+          "match": "^(\\s+)(coalesce_zero)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.coalesce-zero.causet" }
+          }
+        },
+        {
+          "comment": "window: section",
+          "match": "^(\\s+)(window)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.window.causet" }
+          }
+        },
+        {
+          "comment": "allowed: [...] (window allowed)",
+          "match": "^(\\s+)(allowed)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.allowed.causet" }
+          }
+        },
+        {
+          "comment": "count: field_name (aggregate count)",
+          "match": "^(\\s+)(count)(\\s*:\\s*)([a-z][a-z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.function.builtin.count.causet" },
+            "4": { "name": "variable.other.field.causet" }
+          }
+        }
+      ]
+    },
+
+    "relationships-block": {
+      "patterns": [
+        {
+          "comment": "Relationship name (snake_case under relationships:)",
+          "match": "^(\\s{2})([a-z][a-z0-9_]*)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "entity.name.type.relationship.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "from: entity_name",
+          "match": "^(\\s+)(from)(\\s*:\\s*)([a-z][a-z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.from.causet" },
+            "4": { "name": "entity.name.type.entity-ref.causet" }
+          }
+        },
+        {
+          "comment": "to: entity_name",
+          "match": "^(\\s+)(to)(\\s*:\\s*)([a-z][a-z0-9_]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.to.causet" },
+            "4": { "name": "entity.name.type.entity-ref.causet" }
+          }
+        },
+        {
+          "comment": "cardinality: many_to_many|one_to_many|one_to_one",
+          "match": "^(\\s+)(cardinality)(\\s*:\\s*)(many_to_many|one_to_many|one_to_one)",
+          "captures": {
+            "2": { "name": "support.type.property-name.cardinality.causet" },
+            "4": { "name": "constant.language.cardinality.causet" }
+          }
+        },
+        {
+          "comment": "unique: true|false",
+          "match": "^(\\s+)(unique)(\\s*:\\s*)(true|false)",
+          "captures": {
+            "2": { "name": "support.type.property-name.unique.causet" },
+            "4": { "name": "constant.language.boolean.causet" }
+          }
+        },
+        {
+          "comment": "emit_events: section",
+          "match": "^(\\s+)(emit_events)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.emit-events.causet" }
+          }
+        },
+        {
+          "comment": "created: / removed: (event names in emit_events)",
+          "match": "^(\\s+)(created|removed)(\\s*:\\s*)([A-Z][A-Z0-9_]+)",
+          "captures": {
+            "2": { "name": "support.type.property-name.lifecycle-event.causet" },
+            "4": { "name": "entity.name.type.event-ref.causet" }
+          }
+        }
+      ]
+    },
+
+    "listeners-block": {
+      "patterns": [
+        {
+          "comment": "on: EVENT_NAME (listener trigger)",
+          "match": "^(\\s*-?\\s*)(on)(\\s*:\\s*)([A-Z][A-Z0-9_]+)",
+          "captures": {
+            "2": { "name": "support.type.property-name.on.causet" },
+            "4": { "name": "entity.name.type.event-ref.listener.causet" }
+          }
+        },
+        {
+          "comment": "mutate: section",
+          "match": "^(\\s+)(mutate)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.mutate.causet" }
+          }
+        },
+        {
+          "comment": "op: increment (listener-specific op)",
+          "match": "(?<=op:\\s)(increment)",
+          "name": "keyword.operator.op.listener.causet"
+        },
+        {
+          "comment": "field: path/name (in listener mutate)",
+          "match": "^(\\s+)(field)(\\s*:\\s*)([a-z][a-z0-9_/]*)",
+          "captures": {
+            "2": { "name": "support.type.property-name.field.causet" },
+            "4": { "name": "variable.other.field.causet" }
+          }
+        }
+      ]
+    },
+
+    "sagas-block": {
+      "patterns": [
+        {
+          "comment": "Saga name",
+          "match": "^(\\s{2})([a-z][a-z0-9_]*)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "entity.name.type.saga.causet" }
+          }
+        },
+        {
+          "comment": "state_path:",
+          "match": "^(\\s+)(state_path)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.state-path.causet" }
+          }
+        },
+        {
+          "comment": "steps: section",
+          "match": "^(\\s+)(steps)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "support.type.property-name.steps.causet" }
+          }
+        },
+        {
+          "comment": "end: true (saga terminal)",
+          "match": "^(\\s+)(end)(\\s*:\\s*)(true)",
+          "captures": {
+            "2": { "name": "support.type.property-name.end.causet" },
+            "4": { "name": "constant.language.boolean.causet" }
+          }
+        }
+      ]
+    },
+
+    "resources-block": {
+      "patterns": [
+        {
+          "comment": "Resource name",
+          "match": "^(\\s{2})([a-z][a-z0-9_]*)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "entity.name.type.resource.causet" }
+          }
+        }
+      ]
+    },
+
+    "commit-envelopes-block": {
+      "patterns": [
+        {
+          "comment": "commit_envelopes root keyword",
+          "match": "^(commit_envelopes)(\\s*:)\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.section.commit-envelopes.causet" },
+            "2": { "name": "punctuation.separator.key-value.causet" }
+          }
+        },
+        {
+          "comment": "Commit envelope definition name (two-space indent)",
+          "match": "^(\\s{2})([a-z][a-z0-9_]*)(\\s*:)\\s*$",
+          "captures": {
+            "2": { "name": "entity.name.type.commit-envelope.causet" }
+          }
+        },
+        {
+          "comment": "lifecycle / timeout / causal_ordering / participants sub-sections",
+          "match": "^(\\s{4})(lifecycle|timeout|causal_ordering|participants)(\\s*:)\\s*(?:#.*)?$",
+          "captures": {
+            "2": { "name": "keyword.other.subsection.causet" }
+          }
+        },
+        {
+          "comment": "causal_ordering mode values",
+          "match": "(?<=mode:\\s)(per_entity|per_aggregate|global)\\b",
+          "name": "string.unquoted.causet-mode.causet"
+        },
+        {
+          "comment": "visibility_gate strategy values",
+          "match": "(?<=strategy:\\s)(shadow_state|immediate)\\b",
+          "name": "string.unquoted.causet-strategy.causet"
+        }
+      ]
+    },
+
+    "screaming-snake-identifier": {
+      "patterns": [
+        {
+          "comment": "Event/action names as standalone values (in lists, emit payload, etc.)",
+          "match": "(?<=[\\s\\[,:]|^\\s*-\\s*)([A-Z][A-Z0-9_]{2,})(?=[\\s\\],#\\n]|$)",
+          "name": "constant.other.event-name.causet"
+        }
+      ]
+    },
+
+    "snake-case-identifier": {
+      "patterns": [
+        {
+          "comment": "Projection/query name references in values (from:, joins, source_events list, etc.)",
+          "match": "(?<=(?:from|table|stream|relationship|target_stream|into):\\s)([a-z][a-z0-9_]+)\\b",
+          "name": "entity.name.class.name-ref.causet"
+        }
+      ]
+    },
+
+    "dsl-keys": {
+      "patterns": [
+        {
+          "comment": "All known DSL keys (fallback catch-all for any not matched above)",
+          "match": "^(\\s*)(dsl_version|app|includes|state|events|actions|projections|queries|relationships|listeners|sagas|resources|commit_envelopes|prompts|decisions|memories|providers|entity_key|entity_expr|entity_id_expr|payload|target|primary_key|derive|mutations|aggregates|aggregate|indexes|fields|rules|then|core|side_effects|side_effect|source_events|table|input|output|provider|executor|model|instructions|emits|embedding|partition_by|content|temperature|max_tokens|timeout|retries|ref|memories|required|description|default|type|item_type|item_fields|op|path|value|event_type|intent_type|emit|submit|target_stream|target_entity|override|state|on|when|expr|from|where|order_by|group_by|joins|left|right|eq|neq|gte|lte|gt|lt|in|nin|gte_window|like|ilike|limit|direction|distinct|count|sum|coalesce_zero|formula_version|preflight|metadata_json|status|source|message|code|name|priority|mutate|field|by|floor|bucket|interval|window|allowed|unique|cardinality|emit_events|created|removed|kind|cap|max|min|delay_seconds|relationship|to_id|from_id|into|as|shard_id|entity_id|state_path|steps|end|pairs|type|partition|columns|index|lock_key|for_each|foreach|stop|continue|schedule|lookup|if|else|sort|map|find|remove|filter|push|unset|merge|clone|set|add|sub|key|start_action|envelope_state|envelope_state_path|lifecycle|timeout|causal_ordering|participants|prepare_event|prepared_event|commit_event|abort_event|abort_after_seconds|tick_event|mode|cursor_field|seq_source|delta_expr|visibility_gate|strategy|visible_path|pending_path|precreate|retention|default_partition|partitions|seq|envelope_id|transfer_id|instantTime|boost|label|rarity|qty|sku|delta|stream)(\\s*:)",
+          "captures": {
+            "2": { "name": "support.type.property-name.dsl-key.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        }
+      ]
+    },
+
+    "ops-inline": {
+      "patterns": [
+        {
+          "comment": "op: value (any known operation)",
+          "match": "(?<=op:\\s*)(set|add|sub|unset|merge|push|remove|filter|find|map|sort|clone|if|for_each|foreach|stop|continue|emit|emit_each|submit|decision|reject|schedule|lock|unlock|lookup|relationship_create|relationship_remove|compute_regen|upsert|delete|replace|soft_delete|bulk_update|update|increment)\\b",
+          "name": "keyword.operator.op.causet"
+        }
+      ]
+    },
+
+    "sql-types": {
+      "patterns": [
+        {
+          "comment": "SQL column types — includes INT alias used in showcase",
+          "match": "\\b(TEXT|INTEGER|INT|BIGINT|BOOLEAN|FLOAT|DOUBLE|JSON|UUID|TIMESTAMP|DECIMAL|NUMERIC|SMALLINT|SERIAL|JSONB|BYTEA|REAL|VARCHAR|TINYINT|CHAR)\\b",
+          "name": "storage.type.sql.causet"
+        }
+      ]
+    },
+
+    "scalar-types": {
+      "patterns": [
+        {
+          "comment": "Scalar DSL types",
+          "match": "(?<=(type|item_type):\\s*)(string|number|int|integer|decimal|boolean|bool|array|object|any|json|timestamp|datetime|date|uuid|float|double)(\\??)(?=[,\\s\\}\\]#\\n]|$)",
+          "captures": {
+            "2": { "name": "storage.type.primitive.causet" },
+            "3": { "name": "keyword.operator.nullable.causet" }
+          }
+        },
+        {
+          "comment": "Payload short-form types (field_name: string)",
+          "match": "(?<=:\\s)(string|number|int|integer|decimal|boolean|bool|array|object|any|json|timestamp|datetime|date|uuid|float|double)(\\??)(?=[,\\s\\}\\]#\\n]|$)",
+          "captures": {
+            "1": { "name": "storage.type.primitive.causet" },
+            "2": { "name": "keyword.operator.nullable.causet" }
+          }
+        }
+      ]
+    },
+
+    "mutation-ops": {
+      "patterns": [
+        {
+          "comment": "Mutation ops as values after op:",
+          "match": "(?<=op:\\s)(upsert|delete|replace|bulk_update|soft_delete)\\b",
+          "name": "keyword.operator.mutation-op.causet"
+        }
+      ]
+    },
+
+    "query-operators": {
+      "patterns": [
+        {
+          "comment": "Query where clause operators",
+          "match": "^(\\s*)(eq|neq|gt|gte|lt|lte|in|nin|gte_window|like|ilike)(\\s*:)",
+          "captures": {
+            "2": { "name": "keyword.operator.query-op.causet" },
+            "3": { "name": "punctuation.separator.key-value.causet" }
+          }
+        }
+      ]
+    },
+
+    "namespaces": {
+      "patterns": [
+        {
+          "comment": "event.field_name (runtime event payload access)",
+          "match": "\\b(event)(\\.)(ts|entity_id|type|payload)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.event.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.language.reserved.causet" }
+          }
+        },
+        {
+          "comment": "event.field_name (other payload fields)",
+          "match": "\\b(event)(\\.)([a-z_][a-z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.event.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.event-field.causet" }
+          }
+        },
+        {
+          "comment": "entity.field_name (entity state access)",
+          "match": "\\b(entity)(\\.)([a-z_][a-z0-9_/.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.entity.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.entity-field.causet" }
+          }
+        },
+        {
+          "comment": "intent.field_name",
+          "match": "\\b(intent)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.intent.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.intent-field.causet" }
+          }
+        },
+        {
+          "comment": "input.field_name",
+          "match": "\\b(input)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.input.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.input-field.causet" }
+          }
+        },
+        {
+          "comment": "state.field_name (projection derive)",
+          "match": "\\b(state)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.state.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.state-field.causet" }
+          }
+        },
+        {
+          "comment": "projection.field_name",
+          "match": "\\b(projection)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.projection.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.projection-field.causet" }
+          }
+        },
+        {
+          "comment": "aggregate.field_name",
+          "match": "\\b(aggregate)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.aggregate.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.aggregate-field.causet" }
+          }
+        },
+        {
+          "comment": "global.field_name / platform.field_name",
+          "match": "\\b(global|platform|project)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.global.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.global-field.causet" }
+          }
+        },
+        {
+          "comment": "it.field_name (filter/remove/find iterator)",
+          "match": "\\b(it)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.iterator.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.iterator-field.causet" }
+          }
+        },
+        {
+          "comment": "item.field_name (emit_each/for_each iterator)",
+          "match": "\\b(item)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.iterator.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.iterator-field.causet" }
+          }
+        },
+        {
+          "comment": "resources.name[key].field",
+          "match": "\\b(resources)(\\.)([a-z_][a-z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.resources.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.resource-name.causet" }
+          }
+        },
+        {
+          "comment": "derived.field_name (same-event derived fields)",
+          "match": "\\b(derived)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.derived.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.derived-field.causet" }
+          }
+        },
+        {
+          "comment": "event.payload.field_name (legacy / backwards compat)",
+          "match": "\\b(event)(\\.)(payload)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.event.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.language.reserved.causet" },
+            "4": { "name": "punctuation.accessor.causet" },
+            "5": { "name": "variable.other.member.event-field.causet" }
+          }
+        },
+        {
+          "comment": "envelope.field_name (commit envelope state access)",
+          "match": "\\b(envelope)(\\.)([a-z_][a-z0-9_.]*)\\b",
+          "captures": {
+            "1": { "name": "variable.language.namespace.envelope.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.envelope-field.causet" }
+          }
+        },
+        {
+          "comment": "found_item / items_copy and other op `as:` bound variables",
+          "match": "\\b([a-z][a-z0-9_]+)(\\.)(sku|qty|value|id|name|label|[a-z_][a-z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "variable.other.bound-var.causet" },
+            "2": { "name": "punctuation.accessor.causet" },
+            "3": { "name": "variable.other.member.bound-field.causet" }
+          }
+        }
+      ]
+    },
+
+    "builtin-functions": {
+      "patterns": [
+        {
+          "comment": "Builtin functions: max, min, floor, size, sum, contains, map, concat, join, shard, coalesce, isnull, format_date, is_prev_day, hash, LOOKUP_FIELD",
+          "match": "\\b(max|min|floor|size|sum|contains|map|concat|join|shard|coalesce|isnull|format_date|is_prev_day|hash|lookup)\\s*(?=\\()",
+          "name": "support.function.builtin.causet"
+        },
+        {
+          "comment": "LOOKUP_FIELD (uppercase form)",
+          "match": "\\b(LOOKUP_FIELD)\\s*(?=\\()",
+          "name": "support.function.builtin.lookup-field.causet"
+        },
+        {
+          "comment": "Forbidden (non-deterministic) functions — error highlight",
+          "match": "\\b(now|random|uuid|shuffle|nanoTime)\\s*(?=\\()",
+          "name": "invalid.illegal.non-deterministic.causet"
+        },
+        {
+          "comment": "Forbidden JVM functions — error highlight",
+          "match": "\\b(System|Runtime|Process|Thread|Runnable|Math\\.random|eval|exec)\\b",
+          "name": "invalid.illegal.forbidden-function.causet"
+        }
+      ]
+    },
+
+    "slash-paths": {
+      "patterns": [
+        {
+          "comment": "Slash-separated field path after path:",
+          "match": "(?<=path:\\s*)(/[A-Za-z0-9_./:-]+)",
+          "name": "string.unquoted.slash-path.causet"
+        },
+        {
+          "comment": "Slash path as value anywhere",
+          "match": "(?<=:\\s)(/[A-Za-z0-9_][A-Za-z0-9_/.-]*)(?=[\\s,\\]\\}#]|$)",
+          "name": "string.unquoted.slash-path.causet"
+        }
+      ]
+    },
+
+    "string-double": {
+      "name": "string.quoted.double.causet",
+      "begin": "\"",
+      "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.causet" } },
+      "end": "\"",
+      "endCaptures": { "0": { "name": "punctuation.definition.string.end.causet" } },
+      "patterns": [
+        { "match": "\\\\.", "name": "constant.character.escape.causet" },
+        { "include": "#embedded-expression" },
+        { "include": "#namespaces" },
+        { "include": "#builtin-functions" },
+        { "include": "#operators" }
+      ]
+    },
+
+    "string-single": {
+      "name": "string.quoted.single.causet",
+      "begin": "'",
+      "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.causet" } },
+      "end": "'",
+      "endCaptures": { "0": { "name": "punctuation.definition.string.end.causet" } },
+      "patterns": [
+        { "match": "''", "name": "constant.character.escape.causet" }
+      ]
+    },
+
+    "embedded-expression": {
+      "comment": "Highlight expression syntax inside quoted strings",
+      "patterns": [
+        {
+          "comment": "Ternary operator",
+          "match": "(\\?:?|:)",
+          "name": "keyword.operator.ternary.causet"
+        },
+        {
+          "comment": "Comparison and logical operators",
+          "match": "(==|!=|>=|<=|>|<|&&|\\|\\|)",
+          "name": "keyword.operator.comparison.causet"
+        },
+        {
+          "comment": "Arithmetic operators",
+          "match": "(\\+|\\-|\\*|/)",
+          "name": "keyword.operator.arithmetic.causet"
+        }
+      ]
+    },
+
+    "boolean-null": {
+      "patterns": [
+        {
+          "match": "(?<=[:\\s\\[,]|^\\s*-\\s*)(true|false)(?=[,\\s\\]\\}#]|$)",
+          "name": "constant.language.boolean.causet"
+        },
+        {
+          "match": "(?<=[:\\s\\[,]|^\\s*-\\s*)(null)(?=[,\\s\\]\\}#]|$)",
+          "name": "constant.language.null.causet"
+        }
+      ]
+    },
+
+    "numbers": {
+      "patterns": [
+        {
+          "match": "(?<=[:\\s\\[,]|^\\s*-\\s*)-?\\d+\\.\\d+(?:[eE][+-]?\\d+)?(?=[,\\s\\]\\}#]|$)",
+          "name": "constant.numeric.float.causet"
+        },
+        {
+          "match": "(?<=[:\\s\\[,]|^\\s*-\\s*)-?\\d+(?=[,\\s\\]\\}#]|$)",
+          "name": "constant.numeric.integer.causet"
+        }
+      ]
+    },
+
+    "brackets": {
+      "patterns": [
+        {
+          "match": "[\\[\\]]",
+          "name": "punctuation.definition.array.causet"
+        },
+        {
+          "match": "[{}]",
+          "name": "punctuation.definition.map.causet"
+        },
+        {
+          "match": "[()]",
+          "name": "punctuation.definition.group.causet"
+        }
+      ]
+    },
+
+    "operators": {
+      "patterns": [
+        {
+          "comment": "Elvis / null-coalesce",
+          "match": "\\?:",
+          "name": "keyword.operator.null-coalesce.causet"
+        },
+        {
+          "comment": "Ternary ?",
+          "match": "(?<![?])\\?(?![:]|\\s*[a-zA-Z])",
+          "name": "keyword.operator.ternary.question.causet"
+        },
+        {
+          "comment": "Comparison operators",
+          "match": "(==|!=|>=|<=|>|<)",
+          "name": "keyword.operator.comparison.causet"
+        },
+        {
+          "comment": "Logical operators",
+          "match": "(&&|\\|\\|)",
+          "name": "keyword.operator.logical.causet"
+        },
+        {
+          "comment": "Arithmetic operators",
+          "match": "(?<=[0-9a-zA-Z_)\\.\\s])(\\+|-|\\*|/)(?=[0-9a-zA-Z_( \t])",
+          "name": "keyword.operator.arithmetic.causet"
+        },
+        {
+          "comment": "Logical not",
+          "match": "!(?!=)",
+          "name": "keyword.operator.not.causet"
+        },
+        {
+          "comment": "Key-value separator",
+          "match": "(?<=[a-zA-Z0-9_])\\s*:",
+          "name": "punctuation.separator.key-value.causet"
+        },
+        {
+          "comment": "Array bracket index",
+          "match": "\\[\\d+\\]",
+          "name": "punctuation.definition.index.causet"
+        }
+      ]
+    }
+  }
+}

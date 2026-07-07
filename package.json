@@ -1,0 +1,24 @@
+{
+  "name": "causet-vscode",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "language-server",
+    "extension",
+    "tests"
+  ],
+  "scripts": {
+    "build": "npm run build -w shared && npm run build -w language-server && npm run build -w extension",
+    "watch": "concurrently \"npm run watch -w shared\" \"npm run watch -w language-server\" \"npm run watch -w extension\"",
+    "test": "npm run test -w tests",
+    "test:coverage": "npm run test:coverage -w tests",
+    "clean": "npm run clean -w shared && npm run clean -w language-server && npm run clean -w extension",
+    "package": "npm run build && npm run package -w extension",
+    "install:all": "npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.5"
+  }
+}

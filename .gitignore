@@ -137,7 +137,8 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
-# Vite files
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
-.vite/
+# VS Code / Cursor extension build artifacts
+extension/dist/
+*.vsix
+.vscode-test/
+**/coverage/

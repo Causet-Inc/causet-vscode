@@ -1,0 +1,57 @@
+{
+  "name": "causet-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage"
+  },
+  "jest": {
+    "preset": "ts-jest/presets/default-esm",
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^causet-shared$": "<rootDir>/../shared/src/index.ts",
+      "^(.+)\\.js$": "$1"
+    },
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "useESM": true,
+          "tsconfig": {
+            "module": "ESNext",
+            "moduleResolution": "bundler"
+          }
+        }
+      ]
+    },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "../shared/src/**/*.ts",
+      "../language-server/src/**/*.ts",
+      "!**/node_modules/**",
+      "!**/*.d.ts"
+    ]
+  },
+  "dependencies": {
+    "@vscode/vsce": "3.9.2",
+    "causet-language-server": "*",
+    "causet-shared": "*",
+    "copy-webpack-plugin": "14.0.0",
+    "vscode-languageserver": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.5"
+  }
+}

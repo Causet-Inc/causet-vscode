@@ -1,0 +1,21 @@
+{
+  "name": "causet-language-server",
+  "version": "0.1.0",
+  "description": "Full Language Server Protocol implementation for the Causet DSL",
+  "type": "module",
+  "main": "./dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "start": "node dist/server.js --stdio"
+  },
+  "dependencies": {
+    "causet-shared": "*",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
